@@ -5,7 +5,10 @@ from datetime import datetime
 from flask import g
 from werkzeug.security import generate_password_hash
 
-CAMINHO = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mundo_viagens.db")
+if os.environ.get("VERCEL"):
+    CAMINHO = "/tmp/mundo_viagens.db"
+else:
+    CAMINHO = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mundo_viagens.db")
 
 ESQUEMA = """
 CREATE TABLE IF NOT EXISTS clientes (
