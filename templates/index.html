@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<section class="cartao destaque">
+  <h1>Para onde você quer ir?</h1>
+  <form action="{{ url_for('voos') }}" method="get">
+    <div class="grade">
+      <div class="campo">
+        <label for="origem">Origem</label>
+        <select id="origem" name="origem" required>
+          {% for cidade in cidades %}<option {% if cidade == 'São Paulo' %}selected{% endif %}>{{ cidade }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="campo">
+        <label for="destino">Destino</label>
+        <select id="destino" name="destino" required>
+          {% for cidade in cidades %}<option {% if cidade == 'Rio de Janeiro' %}selected{% endif %}>{{ cidade }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="campo">
+        <label for="data">Data da ida</label>
+        <input type="date" id="data" name="data" min="{{ hoje }}" required>
+      </div>
+      <div class="campo">
+        <label for="passageiros">Passageiros</label>
+        <input type="number" id="passageiros" name="passageiros" min="1" max="9" value="1" required>
+      </div>
+    </div>
+    <button type="submit">Buscar voos</button>
+  </form>
+</section>
+
+{% if promocoes %}
+<h2>Promoções ativas</h2>
+<div class="grade">
+  {% for promocao in promocoes %}
+  <div class="cartao">
+    <strong>{{ promocao.descricao }}</strong>
+    <div class="preco">{{ '%g' % promocao.desconto }}% OFF</div>
+    <span class="discreto">Pacotes para {{ promocao.destino }}</span>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<h2>Como funciona</h2>
+<div class="grade">
+  <div class="cartao"><strong>1. Pesquise</strong><p class="discreto">Voos em tempo real da SkyHigh Airlines.</p></div>
+  <div class="cartao"><strong>2. Monte seu pacote</strong><p class="discreto">Somente a passagem ou com hotel parceiro.</p></div>
+  <div class="cartao"><strong>3. Pague</strong><p class="discreto">Cartão (confirmação imediata) ou boleto.</p></div>
+  <div class="cartao"><strong>4. Acompanhe</strong><p class="discreto">Histórico, bilhetes e cancelamento online.</p></div>
+</div>
+{% endblock %}

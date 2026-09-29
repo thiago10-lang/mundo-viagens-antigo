@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<h1>Clientes</h1>
+<div class="tabela">
+  <table>
+    <tr><th>Nome</th><th>CPF</th><th>E-mail</th><th>Reservas</th><th>Cancel. 30 dias</th><th>Situação</th><th>Ação</th></tr>
+    {% for cliente in clientes %}
+    <tr>
+      <td>{{ cliente.nome }}</td>
+      <td>{{ cliente.cpf | cpf }}</td>
+      <td>{{ cliente.email }}</td>
+      <td>{{ cliente.total_reservas }}</td>
+      <td>{{ cliente.cancelamentos_30 }}</td>
+      <td><span class="selo {{ 'bloqueado' if cliente.bloqueado else 'ativo' }}">{{ 'bloqueado' if cliente.bloqueado else 'ativo' }}</span></td>
+      <td>
+        {% if cliente.bloqueado %}
+        <form method="post" action="{{ url_for('admin_cliente_bloqueio', cliente_id=cliente.id, acao='desbloquear') }}">
+          <button type="submit" class="pequeno secundario">Desbloquear</button>
+        </form>
+        {% else %}
+        <form method="post" action="{{ url_for('admin_cliente_bloqueio', cliente_id=cliente.id, acao='bloquear') }}">
+          <button type="submit" class="pequeno perigo">Bloquear</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

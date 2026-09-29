@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<div class="cartao formulario-estreito">
+  <h1>{% if admin %}Área da agência{% else %}Entrar{% endif %}</h1>
+  <form method="post">
+    <input type="hidden" name="proximo" value="{{ proximo }}">
+    <div class="campo">
+      <label for="email">E-mail</label>
+      <input type="email" id="email" name="email" required autofocus>
+    </div>
+    <div class="campo">
+      <label for="senha">Senha</label>
+      <input type="password" id="senha" name="senha" required>
+    </div>
+    <button type="submit">Entrar</button>
+  </form>
+  {% if not admin %}
+  <p class="discreto">Ainda não tem conta? <a href="{{ url_for('cadastro') }}">Cadastre-se</a></p>
+  {% endif %}
+</div>
+{% endblock %}

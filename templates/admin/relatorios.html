@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<h1>Relatórios</h1>
+
+<div class="grade">
+  <div class="cartao"><div class="numero">{{ basico.vendas_mes or 0 }}</div>Vendas confirmadas no mês<br><strong>{{ basico.valor_mes | moeda }}</strong></div>
+  <div class="cartao"><div class="numero">{{ basico.pendentes or 0 }}</div>Reservas pendentes de pagamento<br><strong>{{ basico.valor_pendente | moeda }}</strong></div>
+  {% if completo %}
+  <div class="cartao"><div class="numero">{{ '%.1f' % completo.taxa }}%</div>Taxa de cancelamento<br><small>{{ completo.totais.canceladas or 0 }} de {{ completo.totais.total }} reservas</small></div>
+  {% endif %}
+</div>
+
+{% if completo %}
+<h2>Faturamento mensal</h2>
+<div class="tabela">
+  <table>
+    <tr><th>Mês</th><th>Vendas pagas</th><th>Faturamento</th><th>Comissão da agência</th></tr>
+    {% for linha in completo.faturamento %}
+    <tr><td>{{ linha.mes[5:] }}/{{ linha.mes[:4] }}</td><td>{{ linha.vendas }}</td><td>{{ linha.faturamento | moeda }}</td><td>{{ linha.comissao | moeda }}</td></tr>
+    {% else %}
+    <tr><td colspan="4">Sem vendas pagas ainda.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+<p class="discreto">O faturamento considera reservas confirmadas e as multas de reservas pagas que foram canceladas.</p>
+
+<h2>Destinos mais vendidos</h2>
+<div class="tabela">
+  <table>
+    <tr><th>Destino</th><th>Reservas confirmadas</th><th>Valor</th></tr>
+    {% for linha in completo.destinos %}
+    <tr><td>{{ linha.destino }}</td><td>{{ linha.quantidade }}</td><td>{{ linha.valor | moeda }}</td></tr>
+    {% else %}
+    <tr><td colspan="3">Sem dados.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+
+<h2>Pacotes mais vendidos</h2>
+<div class="tabela">
+  <table>
+    <tr><th>Destino</th><th>Pacote</th><th>Quantidade</th></tr>
+    {% for linha in completo.pacotes %}
+    <tr><td>{{ linha.destino }}</td><td>{{ linha.pacote }}</td><td>{{ linha.quantidade }}</td></tr>
+    {% else %}
+    <tr><td colspan="3">Sem dados.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% else %}
+<p class="discreto">Relatórios gerenciais completos estão disponíveis para gerentes e para a dona.</p>
+{% endif %}
+{% endblock %}

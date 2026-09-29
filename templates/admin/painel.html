@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<h1>Olá, {{ session.admin_nome }}!</h1>
+<div class="grade">
+  <a class="cartao" href="{{ url_for('admin_reservas', status='pendente') }}">
+    <div class="numero">{{ resumo.pendentes }}</div>Reservas pendentes de pagamento
+  </a>
+  <div class="cartao"><div class="numero">{{ resumo.confirmadas_mes }}</div>Vendas confirmadas no mês</div>
+  <div class="cartao"><div class="numero">{{ resumo.clientes }}</div>Clientes cadastrados</div>
+  <div class="cartao"><div class="numero">{{ resumo.bloqueados }}</div>Clientes bloqueados</div>
+</div>
+
+<h2>Suas permissões ({{ session.admin_perfil }})</h2>
+<div class="cartao">
+  <ul>
+    <li>Consultar reservas e confirmar pagamentos por boleto</li>
+    <li>Cadastrar hotéis parceiros</li>
+    <li>Relatórios {% if nivel_admin >= 2 %}gerenciais completos{% else %}básicos{% endif %}</li>
+    {% if nivel_admin >= 2 %}
+    <li>Bloquear e desbloquear clientes</li>
+    <li>Editar e desativar hotéis, gerenciar promoções</li>
+    <li>Consultar o log de auditoria</li>
+    {% endif %}
+    {% if nivel_admin >= 3 %}
+    <li>Configurar a comissão da agência e a integração com a companhia aérea</li>
+    {% endif %}
+  </ul>
+</div>
+{% endblock %}

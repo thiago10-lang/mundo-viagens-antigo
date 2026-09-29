@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<h1>Minhas reservas</h1>
+
+{% if cliente.bloqueado %}
+<div class="alerta erro">Sua conta está bloqueada para novas reservas. Entre em contato com a agência.</div>
+{% endif %}
+
+{% if reservas %}
+<div class="tabela">
+  <table>
+    <tr><th>#</th><th>Trecho</th><th>Voo</th><th>Hotel</th><th>Total</th><th>Status</th><th></th></tr>
+    {% for reserva in reservas %}
+    <tr>
+      <td>{{ reserva.id }}</td>
+      <td>{{ reserva.origem }} → {{ reserva.destino }}</td>
+      <td>{{ reserva.data_voo | data_br }}</td>
+      <td>{{ reserva.hotel_nome or '—' }}</td>
+      <td>{{ reserva.total | moeda }}</td>
+      <td><span class="selo {{ reserva.status }}">{{ reserva.status }}</span></td>
+      <td><a href="{{ url_for('ver_reserva', reserva_id=reserva.id) }}">Detalhes</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% else %}
+<div class="cartao">Você ainda não fez nenhuma reserva. <a href="{{ url_for('index') }}">Buscar voos</a></div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<div class="cartao formulario-estreito">
+  <h1>Criar conta</h1>
+  <form method="post">
+    <div class="campo">
+      <label for="nome">Nome completo</label>
+      <input id="nome" name="nome" value="{{ dados.nome }}" required>
+    </div>
+    <div class="campo">
+      <label for="cpf">CPF</label>
+      <input id="cpf" name="cpf" value="{{ dados.cpf }}" placeholder="000.000.000-00" inputmode="numeric" required>
+    </div>
+    <div class="campo">
+      <label for="email">E-mail</label>
+      <input type="email" id="email" name="email" value="{{ dados.email }}" required>
+    </div>
+    <div class="campo">
+      <label for="senha">Senha (mínimo 6 caracteres)</label>
+      <input type="password" id="senha" name="senha" minlength="6" required>
+    </div>
+    <div class="campo">
+      <label for="confirmacao">Confirme a senha</label>
+      <input type="password" id="confirmacao" name="confirmacao" minlength="6" required>
+    </div>
+    <button type="submit">Cadastrar</button>
+  </form>
+  <p class="discreto">Já tem conta? <a href="{{ url_for('login') }}">Entrar</a></p>
+</div>
+{% endblock %}

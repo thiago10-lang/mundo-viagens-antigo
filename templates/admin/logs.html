@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<h1>Log de auditoria</h1>
+<div class="tabela">
+  <table>
+    <tr><th>Data/hora</th><th>Usuário</th><th>Operação</th><th>Detalhe</th></tr>
+    {% for log in logs %}
+    <tr><td>{{ log.data_hora | data_br }}</td><td>{{ log.usuario }}</td><td>{{ log.acao }}</td><td>{{ log.detalhe }}</td></tr>
+    {% else %}
+    <tr><td colspan="4">Nenhuma operação registrada.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

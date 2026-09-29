@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<h1>Hotéis parceiros</h1>
+
+<form method="post" class="cartao">
+  <h2>Cadastrar hotel</h2>
+  <div class="grade">
+    <div class="campo"><label for="nome">Nome</label><input id="nome" name="nome" required></div>
+    <div class="campo">
+      <label for="cidade">Cidade</label>
+      <select id="cidade" name="cidade">{% for cidade in cidades %}<option>{{ cidade }}</option>{% endfor %}</select>
+    </div>
+    <div class="campo"><label for="endereco">Endereço</label><input id="endereco" name="endereco"></div>
+    <div class="campo"><label for="quartos">Quartos</label><input type="number" id="quartos" name="quartos" min="1" required></div>
+    <div class="campo"><label for="diaria">Diária (R$)</label><input id="diaria" name="diaria" inputmode="decimal" required></div>
+  </div>
+  <button type="submit">Cadastrar</button>
+</form>
+
+<div class="tabela">
+  <table>
+    <tr><th>Hotel</th><th>Cidade</th><th>Quartos</th><th>Diária</th><th>Status</th>{% if nivel_admin >= 2 %}<th>Ações</th>{% endif %}</tr>
+    {% for hotel in hoteis %}
+    <tr>
+      <td>{{ hotel.nome }}<br><small>{{ hotel.endereco }}</small></td>
+      <td>{{ hotel.cidade }}</td>
+      <td>{{ hotel.quartos }}</td>
+      <td>{{ hotel.diaria | moeda }}</td>
+      <td><span class="selo {{ 'ativo' if hotel.ativo else 'inativo' }}">{{ 'ativo' if hotel.ativo else 'inativo' }}</span></td>
+      {% if nivel_admin >= 2 %}
+      <td class="acoes">
+        <a class="botao pequeno secundario" href="{{ url_for('admin_hotel_editar', hotel_id=hotel.id) }}">Editar</a>
+        <form method="post" action="{{ url_for('admin_hotel_alternar', hotel_id=hotel.id) }}">
+          <button type="submit" class="pequeno {{ 'perigo' if hotel.ativo else '' }}">{{ 'Desativar' if hotel.ativo else 'Ativar' }}</button>
+        </form>
+      </td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

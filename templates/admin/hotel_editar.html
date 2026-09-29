@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<form method="post" class="cartao formulario-estreito">
+  <h1>Editar hotel</h1>
+  <div class="campo"><label for="nome">Nome</label><input id="nome" name="nome" value="{{ hotel.nome }}" required></div>
+  <div class="campo">
+    <label for="cidade">Cidade</label>
+    <select id="cidade" name="cidade">
+      {% for cidade in cidades %}<option {% if cidade == hotel.cidade %}selected{% endif %}>{{ cidade }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="campo"><label for="endereco">Endereço</label><input id="endereco" name="endereco" value="{{ hotel.endereco or '' }}"></div>
+  <div class="campo"><label for="quartos">Quartos</label><input type="number" id="quartos" name="quartos" min="1" value="{{ hotel.quartos }}" required></div>
+  <div class="campo"><label for="diaria">Diária (R$)</label><input id="diaria" name="diaria" value="{{ hotel.diaria }}" required></div>
+  <div class="acoes">
+    <button type="submit">Salvar</button>
+    <a class="botao secundario" href="{{ url_for('admin_hoteis') }}">Voltar</a>
+  </div>
+</form>
+{% endblock %}

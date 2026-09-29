@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<h1>Promoções</h1>
+<form method="post" class="cartao">
+  <h2>Nova promoção</h2>
+  <div class="grade">
+    <div class="campo"><label for="descricao">Descrição</label><input id="descricao" name="descricao" required></div>
+    <div class="campo">
+      <label for="destino">Destino</label>
+      <select id="destino" name="destino">{% for cidade in cidades %}<option>{{ cidade }}</option>{% endfor %}</select>
+    </div>
+    <div class="campo"><label for="desconto">Desconto (%)</label><input id="desconto" name="desconto" inputmode="decimal" required></div>
+  </div>
+  <button type="submit">Criar promoção</button>
+</form>
+
+<div class="tabela">
+  <table>
+    <tr><th>Descrição</th><th>Destino</th><th>Desconto</th><th>Status</th><th>Ação</th></tr>
+    {% for promocao in promocoes %}
+    <tr>
+      <td>{{ promocao.descricao }}</td>
+      <td>{{ promocao.destino }}</td>
+      <td>{{ '%g' % promocao.desconto }}%</td>
+      <td><span class="selo {{ 'ativo' if promocao.ativa else 'inativo' }}">{{ 'ativa' if promocao.ativa else 'inativa' }}</span></td>
+      <td>
+        <form method="post" action="{{ url_for('admin_promocao_alternar', promocao_id=promocao.id) }}">
+          <button type="submit" class="pequeno {{ 'perigo' if promocao.ativa else 'secundario' }}">{{ 'Desativar' if promocao.ativa else 'Ativar' }}</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

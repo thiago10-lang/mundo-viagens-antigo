@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<div class="cartao">
+  <h1>Ops!</h1>
+  <p>{{ mensagem }}</p>
+  <a class="botao secundario" href="{{ url_for('index') }}">Voltar ao início</a>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Mundo Viagens{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+</head>
+<body>
+  {% if session.admin_perfil %}
+  <header class="admin">
+    <div class="topo">
+      <a class="marca" href="{{ url_for('admin_painel') }}">Mundo <span>Viagens</span> · Painel</a>
+      <nav>
+        <a href="{{ url_for('admin_painel') }}">Início</a>
+        <a href="{{ url_for('admin_reservas') }}">Reservas</a>
+        <a href="{{ url_for('admin_hoteis') }}">Hotéis</a>
+        {% if nivel_admin >= 2 %}
+        <a href="{{ url_for('admin_clientes') }}">Clientes</a>
+        <a href="{{ url_for('admin_promocoes') }}">Promoções</a>
+        {% endif %}
+        <a href="{{ url_for('admin_relatorios') }}">Relatórios</a>
+        {% if nivel_admin >= 2 %}<a href="{{ url_for('admin_logs') }}">Auditoria</a>{% endif %}
+        {% if nivel_admin >= 3 %}<a href="{{ url_for('admin_configuracoes') }}">Configurações</a>{% endif %}
+        <a href="{{ url_for('admin_logout') }}">Sair ({{ session.admin_nome }} · {{ session.admin_perfil }})</a>
+      </nav>
+    </div>
+  </header>
+  {% else %}
+  <header>
+    <div class="topo">
+      <a class="marca" href="{{ url_for('index') }}">Mundo <span>Viagens</span></a>
+      <nav>
+        <a href="{{ url_for('index') }}">Buscar voos</a>
+        {% if session.cliente_id %}
+        <a href="{{ url_for('minhas_reservas') }}">Minhas reservas</a>
+        <a href="{{ url_for('logout') }}">Sair ({{ session.cliente_nome }})</a>
+        {% else %}
+        <a href="{{ url_for('login') }}">Entrar</a>
+        <a href="{{ url_for('cadastro') }}">Cadastre-se</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+  {% endif %}
+  <main>
+    {% for categoria, mensagem in get_flashed_messages(with_categories=true) %}
+    <div class="alerta {{ categoria }}">{{ mensagem }}</div>
+    {% endfor %}
+    {% block conteudo %}{% endblock %}
+  </main>
+  <footer>
+    Mundo Viagens · São Paulo · <a href="{{ url_for('admin_login') }}">Área da agência</a>
+  </footer>
+</body>
+</html>

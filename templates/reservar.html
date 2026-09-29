@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<h1>Monte seu pacote</h1>
+
+{% if cliente.bloqueado %}
+<div class="alerta erro">Sua conta está bloqueada para novas reservas. Entre em contato com a agência.</div>
+{% endif %}
+
+<div class="cartao voo">
+  <div>
+    <strong>{{ voo.origem }} → {{ voo.destino }}</strong>
+    <div class="discreto">{{ voo.companhia }} · voo {{ voo.codigo }}</div>
+    <div>Partida {{ voo.partida | data_br }} · Chegada {{ voo.chegada | data_br }}</div>
+  </div>
+  <div>
+    <div class="preco">{{ voo.preco | moeda }}</div>
+    <div class="discreto">× {{ passageiros }} passageiro(s)</div>
+  </div>
+</div>
+
+<form method="post" id="form-reserva"
+      data-voo="{{ voo.preco * passageiros }}" data-desconto="{{ desconto_pct }}" data-comissao="{{ comissao_pct }}">
+  <div class="cartao">
+    <h2>Hospedagem</h2>
+    <div class="campo">
+      <label for="hotel_id">Hotel parceiro em {{ voo.destino }}</label>
+      <select id="hotel_id" name="hotel_id">
+        <option value="" data-diaria="0">Somente passagem aérea (sem hotel)</option>
+        {% for hotel in hoteis %}
+        <option value="{{ hotel.id }}" data-diaria="{{ hotel.diaria }}" {% if dados.hotel_id == hotel.id|string %}selected{% endif %}>
+          {{ hotel.nome }} · {{ hotel.diaria | moeda }} / noite por quarto
+        </option>
+        {% endfor %}
+      </select>
+      {% if not hoteis %}<p class="discreto">Ainda não temos hotéis parceiros neste destino.</p>{% endif %}
+    </div>
+    <div class="grade" id="campos-hotel">
+      <div class="campo">
+        <label for="checkin">Check-in</label>
+        <input type="date" id="checkin" name="checkin" value="{{ dados.checkin }}">
+      </div>
+      <div class="campo">
+        <label for="checkout">Check-out</label>
+        <input type="date" id="checkout" name="checkout" value="{{ dados.checkout }}">
+      </div>
+      <div class="campo">
+        <label for="quartos">Quartos</label>
+        <input type="number" id="quartos" name="quartos" min="1" max="10" value="{{ dados.quartos or 1 }}">
+      </div>
+    </div>
+  </div>
+
+  <div class="cartao">
+    <h2>Pagamento</h2>
+    <label class="opcao"><input type="radio" name="forma_pagamento" value="cartao" {% if dados.forma_pagamento != 'boleto' %}checked{% endif %}>Cartão de crédito (confirmação imediata)</label>
+    <label class="opcao"><input type="radio" name="forma_pagamento" value="boleto" {% if dados.forma_pagamento == 'boleto' %}checked{% endif %}>Boleto (compensação em até 2 dias úteis; a reserva fica pendente)</label>
+    <div class="grade" id="campos-cartao">
+      <div class="campo">
+        <label for="cartao_numero">Número do cartão</label>
+        <input id="cartao_numero" name="cartao_numero" inputmode="numeric" placeholder="0000 0000 0000 0000" autocomplete="off">
+      </div>
+      <div class="campo">
+        <label for="cartao_nome">Nome impresso</label>
+        <input id="cartao_nome" name="cartao_nome" autocomplete="off">
+      </div>
+      <div class="campo">
+        <label for="cartao_validade">Validade (MM/AA)</label>
+        <input id="cartao_validade" name="cartao_validade" placeholder="12/29" autocomplete="off">
+      </div>
+      <div class="campo">
+        <label for="cartao_cvv">CVV</label>
+        <input id="cartao_cvv" name="cartao_cvv" inputmode="numeric" maxlength="4" autocomplete="off">
+      </div>
+    </div>
+  </div>
+
+  <div class="cartao">
+    <h2>Resumo</h2>
+    <table class="resumo">
+      <tr><td>Passagens ({{ passageiros }}×)</td><td id="r-voo"></td></tr>
+      <tr><td>Hotel</td><td id="r-hotel"></td></tr>
+      {% if promocao %}<tr><td>Desconto "{{ promocao.descricao }}" ({{ '%g' % desconto_pct }}%)</td><td id="r-desconto"></td></tr>{% endif %}
+      <tr><td>Taxa de serviço da agência ({{ '%g' % comissao_pct }}%)</td><td id="r-comissao"></td></tr>
+      <tr class="total"><td>Total</td><td id="r-total"></td></tr>
+    </table>
+    <p class="discreto">Cancelamento gratuito até 48h antes do voo. Depois disso, multa de 20% do valor do pacote.</p>
+    <button type="submit">Confirmar reserva</button>
+  </div>
+</form>
+
+<script>
+  const formulario = document.getElementById("form-reserva");
+  const real = valor => valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  function atualizar() {
+    const voo = parseFloat(formulario.dataset.voo);
+    const opcao = formulario.hotel_id.options[formulario.hotel_id.selectedIndex];
+    let hotel = 0;
+    if (formulario.hotel_id.value) {
+      const noites = Math.round((new Date(formulario.checkout.value) - new Date(formulario.checkin.value)) / 86400000);
+      if (noites > 0) hotel = parseFloat(opcao.dataset.diaria) * noites * (parseInt(formulario.quartos.value) || 1);
+    }
+    const subtotal = voo + hotel;
+    const desconto = subtotal * parseFloat(formulario.dataset.desconto) / 100;
+    const comissao = (subtotal - desconto) * parseFloat(formulario.dataset.comissao) / 100;
+    document.getElementById("campos-hotel").style.display = formulario.hotel_id.value ? "" : "none";
+    document.getElementById("campos-cartao").style.display = formulario.forma_pagamento.value === "cartao" ? "" : "none";
+    document.getElementById("r-voo").textContent = real(voo);
+    document.getElementById("r-hotel").textContent = formulario.hotel_id.value ? real(hotel) : "Sem hotel";
+    const campoDesconto = document.getElementById("r-desconto");
+    if (campoDesconto) campoDesconto.textContent = "- " + real(desconto);
+    document.getElementById("r-comissao").textContent = real(comissao);
+    document.getElementById("r-total").textContent = real(subtotal - desconto + comissao);
+  }
+  formulario.addEventListener("input", atualizar);
+  formulario.addEventListener("change", atualizar);
+  atualizar();
+</script>
+{% endblock %}

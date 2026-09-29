@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<h1>{{ origem }} → {{ destino }}</h1>
+<p class="discreto">{{ data | data_br }} · {{ passageiros }} passageiro(s) · <a href="{{ url_for('index') }}">nova busca</a></p>
+
+{% if indisponiveis %}
+<div class="alerta erro">{{ mensagem_indisponivel }}</div>
+{% endif %}
+
+{% if promocao %}
+<div class="alerta sucesso">Promoção "{{ promocao.descricao }}": {{ '%g' % promocao.desconto }}% de desconto no pacote para {{ destino }}!</div>
+{% endif %}
+
+{% for voo in voos %}
+<div class="cartao voo">
+  <div>
+    <div class="horario">{{ voo.partida[11:] }} → {{ voo.chegada[11:] }}{% if voo.chegada[:10] != voo.partida[:10] %} <small>(+1)</small>{% endif %}</div>
+    <div class="discreto">{{ voo.companhia }} · voo {{ voo.codigo }} · {{ voo.assentos }} assentos disponíveis</div>
+  </div>
+  <div>
+    <div class="preco">{{ voo.preco | moeda }}</div>
+    <div class="discreto">por passageiro</div>
+  </div>
+  <a class="botao" href="{{ url_for('reservar', indice=loop.index0) }}">Selecionar</a>
+</div>
+{% else %}
+{% if not indisponiveis %}
+<div class="cartao">Nenhum voo disponível para essa data. Tente outra data.</div>
+{% endif %}
+{% endfor %}
+{% endblock %}

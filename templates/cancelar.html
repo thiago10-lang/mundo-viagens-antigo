@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<div class="cartao formulario-estreito">
+  <h1>Cancelar reserva #{{ reserva.id }}</h1>
+  <p>{{ reserva.origem }} → {{ reserva.destino }} · voo em {{ reserva.data_voo | data_br }}</p>
+  {% if not reserva.pago %}
+  <div class="alerta aviso">Esta reserva ainda não foi paga, então não há multa nem reembolso.</div>
+  {% elif multa %}
+  <div class="alerta erro">Faltam menos de 48 horas para o voo ({{ horas | round(1) }}h). Será cobrada multa de 20%: <strong>{{ multa | moeda }}</strong>.</div>
+  {% else %}
+  <div class="alerta sucesso">Cancelamento com mais de 48 horas de antecedência: sem multa.</div>
+  {% endif %}
+  <table class="resumo">
+    <tr><td>Valor pago</td><td>{{ (reserva.total if reserva.pago else 0) | moeda }}</td></tr>
+    <tr><td>Multa</td><td>{{ multa | moeda }}</td></tr>
+    <tr class="total"><td>Reembolso</td><td>{{ reembolso | moeda }}</td></tr>
+  </table>
+  <p class="discreto">Atenção: 3 cancelamentos em menos de 30 dias bloqueiam novas reservas.</p>
+  <form method="post" class="acoes">
+    <button type="submit" class="perigo">Confirmar cancelamento</button>
+    <a class="botao secundario" href="{{ url_for('ver_reserva', reserva_id=reserva.id) }}">Voltar</a>
+  </form>
+</div>
+{% endblock %}

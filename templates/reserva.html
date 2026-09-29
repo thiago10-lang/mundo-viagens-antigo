@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<h1>Reserva #{{ reserva.id }} <span class="selo {{ reserva.status }}">{{ reserva.status }}</span></h1>
+
+{% if boleto %}
+<div class="cartao">
+  <h2>Boleto para pagamento</h2>
+  <div class="linha-boleto">{{ boleto.linha }}</div>
+  <p>Valor: <strong>{{ reserva.total | moeda }}</strong> · Vencimento: {{ boleto.vencimento | data_br }}</p>
+  <p class="discreto">Após a compensação (até 2 dias úteis), um atendente confirmará o pagamento e seu bilhete será emitido.</p>
+</div>
+{% endif %}
+
+<div class="cartao">
+  <h2>Voo</h2>
+  <p><strong>{{ reserva.origem }} → {{ reserva.destino }}</strong> · {{ reserva.companhia }} voo {{ reserva.voo_codigo }}</p>
+  <p>Partida {{ reserva.data_voo | data_br }} · Chegada {{ reserva.chegada | data_br }} · {{ reserva.passageiros }} passageiro(s)</p>
+  <p>Localizador: <strong>{{ reserva.localizador }}</strong>
+    {% if reserva.bilhete %} · Bilhete eletrônico: <strong>{{ reserva.bilhete }}</strong>{% endif %}</p>
+</div>
+
+{% if reserva.hotel_id %}
+<div class="cartao">
+  <h2>Hotel</h2>
+  <p><strong>{{ reserva.hotel_nome }}</strong> · {{ reserva.hotel_endereco }}</p>
+  <p>Check-in {{ reserva.checkin | data_br }} · Check-out {{ reserva.checkout | data_br }} · {{ reserva.quartos }} quarto(s)</p>
+</div>
+{% endif %}
+
+<div class="cartao">
+  <h2>Valores</h2>
+  <table class="resumo">
+    <tr><td>Passagens</td><td>{{ (reserva.preco_voo * reserva.passageiros) | moeda }}</td></tr>
+    <tr><td>Hotel</td><td>{{ reserva.preco_hotel | moeda }}</td></tr>
+    {% if reserva.desconto %}<tr><td>Desconto promocional</td><td>- {{ reserva.desconto | moeda }}</td></tr>{% endif %}
+    <tr><td>Taxa de serviço da agência</td><td>{{ reserva.comissao | moeda }}</td></tr>
+    <tr class="total"><td>Total</td><td>{{ reserva.total | moeda }}</td></tr>
+    <tr><td>Forma de pagamento</td><td>{{ 'Cartão de crédito' if reserva.forma_pagamento == 'cartao' else 'Boleto' }}</td></tr>
+    {% if reserva.status == 'cancelada' %}
+    <tr><td>Multa de cancelamento</td><td>{{ reserva.multa | moeda }}</td></tr>
+    <tr><td>Valor a ser reembolsado</td><td>{{ reserva.reembolso | moeda }}</td></tr>
+    {% endif %}
+  </table>
+</div>
+
+<div class="acoes">
+  <a class="botao secundario" href="{{ url_for('minhas_reservas') }}">Minhas reservas</a>
+  {% if reserva.status != 'cancelada' %}
+  <a class="botao perigo" href="{{ url_for('cancelar_reserva', reserva_id=reserva.id) }}">Cancelar reserva</a>
+  {% endif %}
+</div>
+{% endblock %}

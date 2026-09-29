@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<h1>Reservas</h1>
+<form method="get" class="cartao">
+  <div class="grade">
+    <div class="campo">
+      <label for="status">Status</label>
+      <select id="status" name="status">
+        <option value="">Todos</option>
+        {% for opcao in ['pendente', 'confirmada', 'cancelada'] %}
+        <option value="{{ opcao }}" {% if status == opcao %}selected{% endif %}>{{ opcao }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="campo">
+      <label for="busca">Cliente, CPF ou localizador</label>
+      <input id="busca" name="busca" value="{{ busca }}">
+    </div>
+  </div>
+  <button type="submit" class="secundario">Filtrar</button>
+</form>
+
+<div class="tabela">
+  <table>
+    <tr><th>#</th><th>Cliente</th><th>Trecho / voo</th><th>Hotel</th><th>Total</th><th>Pagamento</th><th>Status</th><th>Ação</th></tr>
+    {% for reserva in reservas %}
+    <tr>
+      <td>{{ reserva.id }}<br><small>{{ reserva.criado_em | data_br }}</small></td>
+      <td>{{ reserva.cliente_nome }}<br><small>{{ reserva.cliente_cpf | cpf }}</small></td>
+      <td>{{ reserva.origem }} → {{ reserva.destino }}<br><small>{{ reserva.voo_codigo }} · {{ reserva.data_voo | data_br }} · loc. {{ reserva.localizador }}</small></td>
+      <td>{% if reserva.hotel_nome %}{{ reserva.hotel_nome }}<br><small>{{ reserva.checkin | data_br }} a {{ reserva.checkout | data_br }} · {{ reserva.quartos }} qto(s)</small>{% else %}—{% endif %}</td>
+      <td>{{ reserva.total | moeda }}{% if reserva.multa %}<br><small>multa {{ reserva.multa | moeda }}</small>{% endif %}</td>
+      <td>{{ 'Cartão' if reserva.forma_pagamento == 'cartao' else 'Boleto' }}</td>
+      <td><span class="selo {{ reserva.status }}">{{ reserva.status }}</span></td>
+      <td>
+        {% if reserva.status == 'pendente' and reserva.forma_pagamento == 'boleto' %}
+        <form method="post" action="{{ url_for('admin_confirmar_pagamento', reserva_id=reserva.id) }}">
+          <button type="submit" class="pequeno">Confirmar boleto</button>
+        </form>
+        {% elif reserva.bilhete %}<small>Bilhete {{ reserva.bilhete }}</small>{% endif %}
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="8">Nenhuma reserva encontrada.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

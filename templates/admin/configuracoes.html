@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<form method="post" class="cartao formulario-estreito">
+  <h1>Configurações</h1>
+  <div class="campo">
+    <label for="comissao">Comissão da agência sobre cada venda (%)</label>
+    <input id="comissao" name="comissao" value="{{ comissao }}" inputmode="decimal" required>
+  </div>
+  <h2>Integração SkyHigh Airlines</h2>
+  <p class="discreto">
+    {% if api_real %}Conectado à API real da SkyHigh via HTTPS.{% else %}Usando o simulador da API da SkyHigh (a API real ainda não foi liberada).{% endif %}
+  </p>
+  <label class="opcao"><input type="checkbox" name="skyhigh_fora_do_ar" {% if fora_do_ar %}checked{% endif %}>Simular SkyHigh fora do ar (teste de falhas)</label>
+  <button type="submit">Salvar</button>
+</form>
+{% endblock %}
